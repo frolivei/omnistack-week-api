@@ -1,13 +1,9 @@
-const axios = require('axios');
 const https = require('https');
+const axios = require('axios');
 const Dev = require('../models/Dev');
+const parseStringAsArray = require('../utils/parseSrtingAsArray');
 
 const GIT_HUB_API_URL = 'https://api.github.com';
-
-function stringToArray(str) {
-    return str.split(',').map(i => i.trim());
-};
-
 
 // index, show, store, update, destroy
 
@@ -20,6 +16,9 @@ module.exports = {
 
     async store(req, res) {
         const { github_username, techs, latitude, longitude } = req.body;
+
+        if (!latitude || !longitude)
+            return res.status(400).send("Longitude and Latitude is required.");
 
         let dev = await Dev.findOne({ github_username });
 
@@ -44,10 +43,10 @@ module.exports = {
 
             const location = {
                 type: 'Point',
-                coordinates: [longitude, latitude],
+                coordinates: [longitude, latitude], 
             }
 
-            const techsArray = stringToArray(techs);
+            const techsArray = parseStringAsArray(techs);
             
             dev = await Dev.create({
                 name,
@@ -59,5 +58,13 @@ module.exports = {
             });
         }
         return res.json(dev);
-    }
+    },
+
+    async update(req, res) {
+        return null;
+    },
+
+    async destroy(req, res) {
+        return null;
+    },
 }
